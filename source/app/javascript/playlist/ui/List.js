@@ -1,10 +1,26 @@
-define(["dojo/_base/array",
+define([
 	"dojo/has",
-	"lib/jquery/jquery-1.10.2.min",
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/kernel",
+	"dojo/promise/all",
+	"dojo/Deferred",
+	"esri/tasks/QueryTask",
+	"esri/tasks/query",
+	"lib/jquery-ui",
 	"lib/jquery.autoellipsis-1.0.10.min",
-	"lib/jquery-ui-1.10.3.custom.min"], 
-	function(array,
-		has){
+	"lib/jquery-ui.min"
+	], 
+	function(
+		has,
+		lang,
+		array,
+		kernel,
+		all,
+		Deferred,
+		QueryTask,
+		Query
+		){
 	/**
 	* Playlist List
 	* @class Playlist List
@@ -18,9 +34,17 @@ define(["dojo/_base/array",
 	{
 		var _listEl = $(selector),
 		_filterSet = [],
-		_searchResults;
-
+		_searchResults,
+		_searchType = "attribute",
+		layersIdsToCheckforIntersect = ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"];
+		
 		addSearchEvents();
+		
+		this.setSearchType = function (searchType) {
+			//Sets _searchType
+			_searchType = searchType;
+			console.log('search type set to : ', searchType);			
+		};
 
 		this.update = function(lyrItems)
 		{
@@ -65,18 +89,35 @@ define(["dojo/_base/array",
 
 		function addSearchEvents()
 		{
-			if (searchSelector){
+			if (searchSelector && _searchType){
+			console.log("I am searching... for :", _searchType);
 
 				$(searchSelector).autocomplete({
 					source: function(request,response){
+						var result;
+						//TODO: determine search type based off of _searchType and search accordingly
+						if(_searchType =="attribute") {
+						//Handle Project Name Search
 						var regex = new RegExp($.ui.autocomplete.escapeRegex(request.term),"i");
 
-						var result = $.grep($(".playlist-item"),function(el){
+						result = $.grep($(".playlist-item"),function(el){
 							return ($(el).find(".item-title div").html().match(regex));
 						});
 
 						_searchResults = result;
-
+						
+						} else if (_searchType == "communityBoundary") {
+						//Handle Community Boundary Search
+						//TODO: Is timeout functioning?
+						setTimeout(lang.hitch(this, function () {
+							prepareQT(window.configOptions.communityBoundaryServiceUrl, request.term, "NAME");
+						},7000));						
+						} else if (_searchType == "wards") {
+						//Handle Wards Search
+						setTimeout(lang.hitch(this, function () {
+							prepareQT(window.configOptions.communityWardsServiceUrl, request.term, "NAME");
+						},7000));						
+						}
 						response(result);
 					},
 					response: function(){
@@ -100,6 +141,10 @@ define(["dojo/_base/array",
 							$("#search-submit").addClass("icon-search").removeClass("icon-close");
 							setItemResults();
 						}
+					},
+					open: function() {
+						//We don't want to see dropdown
+						$(".ui-autocomplete").hide();
 					}
 				});
 
@@ -121,18 +166,87 @@ define(["dojo/_base/array",
 				});
 			}
 		}
+		function prepareQT (serviceUrl, searchTerm, attributeToSearch) {
+		//Prepare esri Query Task to retrieve a desired geometry
+		var query = new Query();
+		var whereStatement = attributeToSearch + " LIKE '%" + searchTerm + "%'";
+		query.where = whereStatement;
+		query.returnGeometry = true;
+		
+		var queryTask = new QueryTask(serviceUrl);
+		queryTask.execute(query, handleQT);
+		}
+		function handleQT (featureSet) {
+			
+			if(featureSet.features && featureSet.features.length > 0 ) {
+			//Take first item and use that geometry
+			var boundary = featureSet.features[0];
+			getIntersectingItems(boundary);
+			} 
+		}
+		
+		function getIntersectingItems (geometryBoundary) {
+			var map =kernel.global.map;
+			console.log('geometryBoundary',geometryBoundary);
 
+			var defs = [];
+			
+			
+			array.forEach(layersIdsToCheckforIntersect, lang.hitch(this, function(id) {
+				//
+				var layer = map.getLayer(id);
+				if(layer) {				
+					if(layer.queryFeatures) {
+						var query = new Query();
+						query.geometry = geometryBoundary.geometry;
+						layer.queryFeatures(query, lang.hitch(this, function(featureSet) {
+							if(featureSet.features && featureSet.features.length > 0) {
+								var items = [];
+								var deferred = new Deferred();
+								defs.push(deferred.promise);
+								array.forEach(featureSet.features, function(feat) {
+									console.log('feat', feat);
+									var item = {
+										layerId: feat._graphicsLayer.id,
+										objectId: feat.attributes.OBJECTID
+									};
+									items.push(item);							
+								});
+								deferred.resolve(items);
+								//return deferred.promise;
+							}
+						}), lang.hitch(this, handleError));
+					}
+				} else {
+					console.warn('layer : ', id, " does not exist.");
+				}				
+			}));
+			
+			console.log(defs);
+			all(defs).then(function(results) {
+				console.log('r', results);
+			});
+		}
+		function handleError (error) {
+			console.error("Error Occurred : ", error.message);
+		}
+		
 		function buildList(lyrItems)
 		{
+		console.log('buildList', lyrItems);
 			for (var layerId in lyrItems){
+				console.log('layerId', layerId);
 				var items = lyrItems[layerId];
+				console.log('items', items);
+				console.log('items[0].graphic.attributes', items[0].graphic.attributes);
 				var attr = getAttributeNames(items[0].graphic.attributes);
 				var titleAttr = {
 					layerId: layerId,
-					fieldName: attr.title
+					fieldName: attr.name
 				};
 				onGetTitleField(titleAttr);
 				array.forEach(items,function(item){
+				console.log('item',item);
 					var objId = item.graphic.attributes[item.objectIdField];
 					var itemStr = "";
 					if (attr.thumbnail){
@@ -148,7 +262,7 @@ define(["dojo/_base/array",
 												<div class="thumbnail-container" style="background-image: url(' + item.graphic.attributes[attr.thumbnail] + '); filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="' + item.graphic.attributes[attr.thumbnail] + '", sizingMethod="scale");"></div>\
 											</td>\
 											<td class="title-cell">\
-												<h6 class="item-title">' + item.graphic.attributes[attr.title] + '</h6>\
+												<h6 class="item-title">' + item.graphic.attributes[window.configOptions.dataFields.nameField] + '</h6>\
 											</td>\
 										</tr>\
 									</tbody>\
@@ -166,7 +280,7 @@ define(["dojo/_base/array",
 												<img src=' + item.iconURL + ' alt="" class="marker" />\
 											</td>\
 											<td class="title-cell">\
-												<h6 class="item-title">' + item.graphic.attributes[attr.title] + '</h6>\
+												<h6 class="item-title">' + item.graphic.attributes[window.configOptions.dataFields.nameField] + '</h6>\
 											</td>\
 										</tr>\
 									</tbody>\

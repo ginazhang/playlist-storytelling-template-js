@@ -1,7 +1,6 @@
 ---
 # Add Page Attributes Here
 ---
-
 <div id="side-pane">
 
 	<div id="side-pane-buffer" class="region-top"></div>
@@ -10,11 +9,11 @@
 			
 		<div id="side-pane-controls" class="region-top">
 			<span class="icon-open-book playlist-control toggle-description" title="Toggle Description"></span>
-			<span class="icon-list-2 playlist-control toggle-legend" title="Toggle Legend"></span>
+			
 			<span class="icon-left-arrow playlist-control toggle-side-pane" title="Minimize list"></span>
 			<span class="icon-right-arrow playlist-control toggle-side-pane" title="Maximize list"></span>
 		</div>
-
+		
 		<div id="side-pane-content" class="region-center">
 			<div id="info-pane" class="region-top">
 				<div id="mobile-info">
@@ -23,29 +22,13 @@
 					<hr>
 				</div>
 				<div id="description"></div>
-				<div id="legend-pane">
-					<div id="playlist-legend" class="legend"></div>
-					<div id="legend" class="legend"></div>
-				</div>
+				
 				<div class="mobile-explore">
 					<button class="btn small back-button">Explore Map</button>
 				</div>
 			</div><!--info-pane-->
 			<div id="playlist-pane" class="region-center">
-				<div id="playlist-controls" class="region-top">
-					<input id="search" type="text" id="playlist-search" name="Search" placeholder="Type to search...">
-					<span id="search-submit" class="icon-search"></span>
-					<div id="filter-wrapper">
-						<p id="filter-toggle" class="icon-filter"></p>
-						<div id="filter-content">
-							<h5 class="filter-title">Choose items to filter:</h5>
-							<label class="select-all">Select All
-								<input type="checkbox" checked>
-							</label>
-							<hr>
-						</div>
-					</div>					
-				</div>
+				
 				<div id="playlist" class="region-center">
 					<div class="playlist-no-layer-message">
 						The storytelling playlist app is a great template to showcase your map with a corresponding interactive list of points displayed in your map. <a href="http://downloads.esri.com/agol/pub/npstop102012/index.html" target="_blank">See example here.</a>
@@ -61,13 +44,13 @@
 				</div>
 			</div><!--/playlist-pane-->
 		</div>
+		
 
 	</div><!--/side-pane-content-wrapper-->
 
 </div><!--/side-pane-->
 
 <div id="content" class="region-center">
-
 	<div id="banner" class="region-top">
 
 		<div id="header-text" class="region-center">
@@ -88,19 +71,58 @@
 					<img id="logoImg" src="resources/images/esriGlobeLogow.png" alt="Esri - Home">
 				</a><!--/logoLink-->
 			</div><!--/logo-->
+			
 		</div><!--/branding-wrapper-->
-
+		<br>
+		<div id="toolPane" class="region-bottom" style="width:100%; height:50px; position:absolute;" >
+			<div id="playlist-controls" class="region-left">
+					<input id="search" type="text" id="playlist-search" name="Search" placeholder="Type to search...">
+					<span id="search-submit" class="icon-search"></span>
+					
+					<div id="filter-wrapper">
+						<p id="filter-toggle" class="icon-filter"></p>
+						<div id="filter-content">
+							<h5 class="filter-title">Choose items to filter:</h5>
+							<label class="select-all">Select All
+								<input type="checkbox" checked>
+							</label>
+							<hr>
+						</div>
+					</div>					
+			</div>
+			<div id="searchRadioContainer">
+			<form>
+				<div id="radio" >
+				<input type="radio" id="projectNameRdBtn" name="project" value="attribute" checked="checked">
+				<label for="projectNameRdBtn">Project Name</label>
+				<input type="radio" id="communityBoundaryRdBtn" name="project" value="communityBoundary">
+				<label for="communityBoundaryRdBtn">Community Boundary </label>
+				<input type="radio" id="wardsRdBtn" name="project" value="wards">
+				<label for="wardsRdBtn">Wards</label>
+				</div>
+			</form>
+			</div>	
+			<div id="TimeSliderDiv" class="region-right"></div>		
+		</div>
 		<div id="mobile-controls" class="region-right">
 			<span class="icon-open-book playlist-control toggle-description"></span>
 			<span class="icon-list-2 playlist-control toggle-legend"></span>
 			<span class="icon-share"></span>
 		</div>
-
+	
 	</div><!--/banner-->
-
+	<div id="legendAndSources" class="region-center closed">
+		<div id="toggleLegend">
+			<span class="icon-list-2 playlist-control toggle-legend" title="Toggle Legend"></span>
+		</div>
+			<div id="legend-pane">
+					<div id="playlist-legend" class="legend"></div>
+					<div id="legend" class="legend"></div>
+			</div>
+	</div>
 	<div id="map-pane" class="region-center">
-
-		<div id="map" class="region-center"></div>
+		<div id="map" class="region-center">
+		</div>
 		<div id="mobile-swipe-toggle" class="icon-right-arrow"></div>
 		<div id="map-blind"></div>
 		<div id="mobile-share">

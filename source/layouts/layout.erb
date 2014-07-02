@@ -35,7 +35,7 @@
 
 	<link type="image/ico" rel="shortcut icon" href="<%= data.config.metaShortcutURL ? data.config.metaShortcutURL : "//resources.esri.com/favicon.ico" %>">
 	<link type="image/ico" rel="icon" href="<%= data.config.metaFaviconURL ? data.config.metaFaviconURL : "//resources.esri.com/favicon.ico" %>">
-
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/vader/jquery-ui.css">
 	<!-- load Avenir from fonts.com  this is will only work on localhost, arcgis.com or esri.com domains -->
 	<%= stylesheet_link_tag "//fast.fonts.com/cssapi/4a60d16b-c9e4-404d-89d3-809adb97d65c.css" %>
 	<% if data.advancedSettings.includeDijitCSS && data.advancedSettings.dijitsTheme %>
@@ -131,6 +131,9 @@
 			subtitle: "<%= data.config.subtitle %>",
 			// Enter a description, if not specified the ArcGIS.com web map's description is used
 			description: "<%= data.config.description %>",
+			communityWardsServiceUrl: "<%= data.config.communityWardsServiceUrl %>",
+			communityBoundaryServiceUrl: "<%= data.config.communityBoundaryServiceUrl %>",
+			appid:"<%= data.config.appid %>",
 			// Choose data fields
 			dataFields: {
 				// Change name field to match data
@@ -182,7 +185,7 @@
 				}
 			},
 			// Add the layer names of valid point layers that should be excluded from the playlist and used as reference layers
-			excludedLayers: [],
+			excludedLayers: ["Community Boundary", "Wards"],
 			// If the webmap uses Bing Maps data, you will need to provided your Bing Maps Key
 			bingMapsKey: "<%= data.config.bingMapsKey %>",
 			// Specify a proxy for custom deployment

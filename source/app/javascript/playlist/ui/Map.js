@@ -12,11 +12,17 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 	"dojo/on",
 	"dojo/has",
 	"dojo/_base/array",
+	"dojo/_base/kernel",
 	"dojo/dom-construct",
 	"esri/symbols/PictureMarkerSymbol",
 	"esri/renderers/UniqueValueRenderer",
 	"esri/tasks/query",
 	"esri/dijit/HistogramTimeSlider",
+	"esri/dijit/TimeSlider",
+	"esri/dijit/BasemapToggle",
+	"esri/renderers/SimpleRenderer",
+	"esri/symbols/SimpleLineSymbol",
+	
 	"dojo/_base/sniff"], 
 	function(MapConfig,
 		Map,
@@ -33,11 +39,18 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 		on,
 		has,
 		array,
+		kernel,
 		domConstruct,
 		PictureMarkerSymbol,
 		UniqueValueRenderer,
 		Query,
-		HistogramTimeSlider){
+		HistogramTimeSlider,
+		TimeSlider,
+		BasemapToggle,
+		SimpleRenderer,
+		SimpleLineSymbol
+		
+		){
 	/**
 	* Playlist Map
 	* @class Playlist Map
@@ -92,7 +105,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 				
 				_mapResponse = response;
 				_map = response.map;
-
+				kernel.global.map = _map;
 				// ADD HOME BUTTON TO ZOOM SLIDER
 				on.once(_map,"extent-change",function(){
 					var homeExtent = _map.extent;
@@ -107,10 +120,18 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 
 				if(_map.loaded){
 					getPointLayers(response.itemInfo.itemData.operationalLayers);
+					createBasemapToggle(_map);
+					createTimeSlider();
+					
 				}
 				else{
 					on(_map,"loaded",function(){
 						getPointLayers(response.itemInfo.itemData.operationalLayers);
+						//Create time slider 
+						//
+						createBasemapToggle(_map);
+						createTimeSlider();
+					
 					});
 				}
 
@@ -147,7 +168,26 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 
 			});
 		};
-
+		function createTimeSlider() {
+			var timeSlider = new TimeSlider({},dom.byId("TimeSliderDiv"));
+			_map.setTimeSlider(timeSlider);  
+			
+			
+			timeSlider.setThumbCount(1);
+			//timeSlider.createTimeStopsByTimeInterval(results[1].layer.timeInfo.timeExtent,1,'esriTimeUnitsWeeks');
+			timeSlider.startup();
+		}
+		
+		function createBasemapToggle(map) {
+			var basemapToggle = new BasemapToggle({
+				theme: "basemapToggle",
+				map: map,
+				visible: true,
+				basemap: "streets"
+			}, "basemapToggleDiv");
+			basemapToggle.startup();
+		}
+		
 		this.resizeMap = function()
 		{
 			_map.resize();
@@ -329,9 +369,11 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			var layerIds = [];
 			var playlistLayers = [];
 			array.forEach(layers,function(layer){
+			console.log('layer is : ', layer);
 				if (layer.featureCollection && layer.featureCollection.layers.length > 0){
+				console.log('feature collection');
 					array.forEach(layer.featureCollection.layers,function(l){
-						if (l.layerDefinition.geometryType === "esriGeometryPoint" && l.visibility && checkExcluded(l.layerObject.name)){
+						if ( l.visibility && checkExcluded(l.layerObject.name)){
 							var playlistLyr = l.layerObject;
 							playlistLayers.push(playlistLyr);
 							var lyrProp = {
@@ -341,13 +383,14 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 								defaultExpression: false
 							};
 							_playlistLayers.push(lyrProp);
-							setRenderer(playlistLyr);
+							setRenderer(playlistLyr, layer.resourceInfo.renderer);
 							addLayerEvents(playlistLyr);
 							layerIds.push(playlistLyr.id);
 						}
 					});
 				}
-				else if(layer.url && layer.resourceInfo.type === "Feature Layer" && layer.resourceInfo.geometryType === "esriGeometryPoint" && layer.visibility && checkExcluded(layer.layerObject.name)){
+				else if(layer.url && layer.resourceInfo.type === "Feature Layer" && layer.visibility && checkExcluded(layer.layerObject.name)){
+				console.log('feature layer');
 					var playlistLyr = layer.layerObject;
 					playlistLayers.push(playlistLyr);
 					playlistLyr.mode = 0;
@@ -369,19 +412,19 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 							_playlistLayers.push(lyrProp);
 
 							// Create Temporary layer object to get first 99 features from a feature layer
-							var layer = {
+							var lyr = {
 								type: "Feature Layer",
 								graphics: features,
 								layerObject: playlistLyr
 							};
-							setRenderer(layer);
+							setRenderer(lyr, layer.resourceInfo.drawingInfo.renderer );
 						});
 
 					});
 					layerIds.push(playlistLyr.id);
 				}
 			});
-			buildLegend(layerIds);			
+			buildLegend();			
 			initTime(playlistLayers);
 		}
 
@@ -403,13 +446,43 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			}
 		}
 
-		function setRenderer(lyr)
+		function setRenderer(lyr, renderer)
 		{
+		console.log('renderer', renderer);
 			var layerObj = lyr;
-
 			if(!lyr.setRenderer){
 				layerObj = lyr.layerObject;
 			}
+			var lyrItems = [];
+			var maxPoints = _mapConfig.getMaxAllowablePoints();
+			
+			if(renderer) {
+			//renderer = new SimpleRenderer();
+			//layerObj.setRenderer(renderer);
+			var s = new SimpleLineSymbol(renderer.symbol.style, renderer.symbol.color, renderer.symbol.width);
+			renderer =  new SimpleRenderer(s);
+			
+			array.forEach(lyr.graphics,function(grp,i){
+				if (i < maxPoints){
+					
+					var symbol = renderer.getSymbol(grp);
+					
+					var item = {
+						layerId: layerObj.id,
+						objectIdField: layerObj.objectIdField,
+						graphic: grp,
+						iconURL: symbol.url,
+						filter: grp.attributes[dataFields.filterField]
+					};
+					lyrItems.push(item);
+				}
+				else{
+					lyr.graphics[i].hide();
+				}
+			});
+			
+			} else {
+				
 
 			// Get Color Attribute
 			var colorAttr;
@@ -451,9 +524,8 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 					return 0;
 				});
 			}
-			var renderer = _mapConfig.getRenderer(layerObj,lyr.graphics,colorAttr,orderAttr);
-			var lyrItems = [];
-			var maxPoints = _mapConfig.getMaxAllowablePoints();
+			renderer = _mapConfig.getRenderer(layerObj,lyr.graphics,colorAttr,orderAttr);
+			
 			array.forEach(lyr.graphics,function(grp,i){
 				if (i < maxPoints){
 					
@@ -472,33 +544,28 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 					lyr.graphics[i].hide();
 				}
 			});
+			
+			}
+			//layerObj.setRenderer(renderer);
 
-			layerObj.setRenderer(renderer);
+			
 			layerObj.redraw();
 			_playlistItems[layerObj.id] = lyrItems;
 			listItemsRefresh();
 
 		}
 
-		function buildLegend(layerIds)
+		function buildLegend()
 		{
-			var layers = arcgisUtils.getLegendLayers(_mapResponse);
-			var legendLyrs = [];
-
-			array.forEach(layers,function(lyr){
-				if (array.indexOf(layerIds,lyr.layer.id) < 0){
-					legendLyrs.push(lyr);
-				}
-			});
-			if (legendLyrs.length > 0){
+		console.log("building legend...");
 				var legend = new Legend({
-					map: _map,
-					layerInfos: legendLyrs
+					map: _map
 				},"legend");
 				legend.startup();
-			}
-
-			if (displayLegend){
+				var playlistStr = '<p class="esriLegendServiceLabel">' + playlistLegendConfig.layerTitle + '</p>';
+				domConstruct.place(playlistStr,dom.byId(playlistLegendSelector),"first");
+				
+			/*if (displayLegend){
 				var playlistStr = '<p class="esriLegendServiceLabel">' + playlistLegendConfig.layerTitle + '</p><table class="esriLayerLegend"><tbody>';
 
 				for (var obj in playlistLegendConfig.items){
@@ -507,7 +574,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 					}
 				}
 
-				playlistStr = playlistStr + '</tbody></table>';
+				//playlistStr = playlistStr + '</tbody></table>';
 
 				domConstruct.place(playlistStr,dom.byId(playlistLegendSelector),"first");
 			}
@@ -518,7 +585,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 				if (legendLyrs < 1){
 					onHideLegend();
 				}
-			}
+			}*/
 		}
 
 		function addLayerEvents(layer)

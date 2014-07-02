@@ -47,7 +47,7 @@ description: ""
 playlistLegendVisible: true
 
 # Playlist layer title
-playlistTitle: Playlist Layer
+playlistTitle: Legend
 
 # Legend names for playlist markers
 playlistRedIcon: Red
@@ -70,11 +70,15 @@ playlistPurpleIconURL: resources/images/markers/indexed/purple/IconPurple1.png
 # MAPS AND DATA CONFIGURATION
 
 # The web map id
-webmap: 225d8fdebb1440db80165645dcd16b91
+webmap: 819abe4373a0412ba6d9917f0bf6af8a
+#AGOL appid
+appid: b2a4548d784f40fb8644552e3369ff13
 # Choose name field
-nameField: ""
+nameField: "Project_Name"
 # Choose image field
-imageField: ""
+imageField: "Oracle_Project__"
+# Choose image location
+imageLocation: "http://arcgis.neorsd.org/storymaps/resources/THUMBNAILS/"
 # Choose color field
 colorField: ""
 # Choose order field
@@ -84,8 +88,14 @@ filterField: ""
 # If the webmap uses Bing Maps data, you will need to provided your Bing Maps Key
 bingMapsKey: ""
 # Specify a proxy for custom deployment
-proxyUrl: ""
+#proxyUrl: "http://localhost/ArcGISWebAppProxy/proxy.ashx"
+proxyUrl: "../ArcGISWebAppProxy/proxy.ashx"
 # Specify the url to a geometry service
-geometryServiceUrl: "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"
+geometryServiceUrl: "http://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"
 # Modify this to point to your sharing service URL if you are using the portal
 sharingUrl: "http://www.arcgis.com/sharing/rest/content/items"
+#REST URL for wards
+communityWardsServiceUrl: "http://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/NEORSD_Cleveland_Wards/FeatureServer/0/"
+#REST URL for community boundary
+communityBoundaryServiceUrl: "https://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/Jurisdiction/FeatureServer/0"
+

@@ -1,0 +1,20 @@
+{
+    "configurationSettings": [
+        {
+            "category": "General Settings",
+            "fields": [
+                {
+                    "type": "string",
+                    "fieldName": "description",
+                    "tooltip": "overview description",
+                    "label": "description:",
+					"placeholder":"enter description"
+                },
+                {
+                    "type": "webmap"
+                }
+            ],
+            "values": {}
+        }
+    ]
+}
