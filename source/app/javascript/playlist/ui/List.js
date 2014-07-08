@@ -36,7 +36,7 @@ define([
 		_filterSet = [],
 		_searchResults,
 		_searchType = "attribute",
-		layersIdsToCheckforIntersect = ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"]; //TODO: Make Configurable
+		layersIdsToCheckforIntersect = configOptions.projectLayerIds;
 		
 		addSearchEvents();
 		
@@ -256,7 +256,7 @@ define([
 			for (var layerId in lyrItems){
 				console.log('layerId', layerId);
 				var items = lyrItems[layerId];
-				console.log('items', items);
+				//console.log('items', items);
 				console.log('items[0].graphic.attributes', items[0].graphic.attributes);
 				var attr = getAttributeNames(items[0].graphic.attributes);
 				var titleAttr = {

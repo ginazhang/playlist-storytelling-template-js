@@ -98,4 +98,5 @@ sharingUrl: "http://www.arcgis.com/sharing/rest/content/items"
 communityWardsServiceUrl: "http://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/NEORSD_Cleveland_Wards/FeatureServer/0/"
 #REST URL for community boundary
 communityBoundaryServiceUrl: "https://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/Jurisdiction/FeatureServer/0"
-
+#Project Layer Id's
+projectLayerIds: ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"]
