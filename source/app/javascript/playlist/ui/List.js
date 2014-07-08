@@ -36,7 +36,7 @@ define([
 		_filterSet = [],
 		_searchResults,
 		_searchType = "attribute",
-		layersIdsToCheckforIntersect = ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"];
+		layersIdsToCheckforIntersect = ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"]; //TODO: Make Configurable
 		
 		addSearchEvents();
 		
@@ -87,15 +87,25 @@ define([
 			$(".playlist-item").removeClass("selected");
 		};
 
+		function filterplaylistItems (result) {
+			
+			$(result).each(function(){
+				$(this).removeClass("hidden-search");
+			});
+			$("#search-submit").addClass("icon-close").removeClass("icon-search");
+			if(_searchType =="attribute") {
+				setItemResults();
+			}			
+		}
+		
 		function addSearchEvents()
 		{
 			if (searchSelector && _searchType){
-			console.log("I am searching... for :", _searchType);
-
 				$(searchSelector).autocomplete({
+					delay:2000,
 					source: function(request,response){
 						var result;
-						//TODO: determine search type based off of _searchType and search accordingly
+						//Determine search type based off of _searchType and search accordingly
 						if(_searchType =="attribute") {
 						//Handle Project Name Search
 						var regex = new RegExp($.ui.autocomplete.escapeRegex(request.term),"i");
@@ -106,27 +116,17 @@ define([
 
 						_searchResults = result;
 						
-						} else if (_searchType == "communityBoundary") {
-						//Handle Community Boundary Search
-						//TODO: Is timeout functioning?
-						setTimeout(lang.hitch(this, function () {
-							prepareQT(window.configOptions.communityBoundaryServiceUrl, request.term, "NAME");
-						},7000));						
-						} else if (_searchType == "wards") {
-						//Handle Wards Search
-						setTimeout(lang.hitch(this, function () {
-							prepareQT(window.configOptions.communityWardsServiceUrl, request.term, "NAME");
-						},7000));						
-						}
-						response(result);
-					},
-					response: function(){
 						$(".playlist-item").addClass("hidden-search");
-						$(_searchResults).each(function(){
-							$(this).removeClass("hidden-search");
-						});
-						$("#search-submit").addClass("icon-close").removeClass("icon-search");
-						setItemResults();						
+						
+						filterplaylistItems(result);
+						
+						} else if (_searchType == "communityBoundary") {
+							//Handle Community Boundary Search
+							prepareQT(window.configOptions.communityBoundaryServiceUrl, request.term, "NAME");				
+						} else if (_searchType == "wards") {
+							//Handle Wards Search
+							prepareQT(window.configOptions.communityWardsServiceUrl, request.term, "NAME");
+						}	
 					},
 					close: function(){
 						if ($(searchSelector).val() === ""){
@@ -186,11 +186,10 @@ define([
 		}
 		
 		function getIntersectingItems (geometryBoundary) {
-			var map =kernel.global.map;
-			console.log('geometryBoundary',geometryBoundary);
-
-			var defs = [];
+			//Using geometryBoundary, find all the intersecting features from layersIdsToCheckforIntersect
 			
+			var map = kernel.global.map;
+			var defs = [];
 			
 			array.forEach(layersIdsToCheckforIntersect, lang.hitch(this, function(id) {
 				//
@@ -198,22 +197,35 @@ define([
 				if(layer) {				
 					if(layer.queryFeatures) {
 						var query = new Query();
+						
+						var deferred = new Deferred();
+						defs.push(deferred.promise);
+						
 						query.geometry = geometryBoundary.geometry;
 						layer.queryFeatures(query, lang.hitch(this, function(featureSet) {
 							if(featureSet.features && featureSet.features.length > 0) {
 								var items = [];
-								var deferred = new Deferred();
-								defs.push(deferred.promise);
+								
+								$(".playlist-item").addClass("hidden-search");
+								
 								array.forEach(featureSet.features, function(feat) {
-									console.log('feat', feat);
 									var item = {
-										layerId: feat._graphicsLayer.id,
+										layerId: layer.id,
 										objectId: feat.attributes.OBJECTID
 									};
-									items.push(item);							
+									//Filter playlist based on the attributes(configOptions.dataFields.nameField) of the items
+									var regex = new RegExp($.ui.autocomplete.escapeRegex(feat.attributes[configOptions.dataFields.nameField]),"i");
+
+									result = $.grep($(".playlist-item"),function(el){
+										return ($(el).find(".item-title div").html().match(regex));
+									});
+									
+									filterplaylistItems(result);
+									items.push(item);					
 								});
 								deferred.resolve(items);
-								//return deferred.promise;
+							} else {
+								deferred.resolve([]);
 							}
 						}), lang.hitch(this, handleError));
 					}
@@ -221,10 +233,17 @@ define([
 					console.warn('layer : ', id, " does not exist.");
 				}				
 			}));
-			
-			console.log(defs);
+
+			//Wait until all deferred are complete to call onSearch
 			all(defs).then(function(results) {
-				console.log('r', results);
+				var items = [];
+				array.forEach(results, function(itemArray) {
+					array.forEach(itemArray, function(item) {
+						items.push(item);
+					});					
+				});
+				
+				onSearch(items);
 			});
 		}
 		function handleError (error) {
