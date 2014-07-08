@@ -4,8 +4,7 @@ define(["dojo/has",
 	"storymaps/playlist/core/mobile/Layout",
 	"storymaps/playlist/ui/Map",
 	"storymaps/playlist/ui/List",
-	"esri/request",
-	
+	"esri/config",
 	"lib/jquery-ui",
 	"lib/jquery-ui.min"
 	
@@ -16,8 +15,7 @@ define(["dojo/has",
 		MobileLayout,
 		Map,
 		List,
-		esriRequest
-		
+		esriConfig
 		
 		){
 
@@ -41,92 +39,76 @@ define(["dojo/has",
 		_map,
 		_list;
 		
-		function requestConfig() {
-		
-		var appid = configOptions.appid;
-		console.log('esri.arcgis.utils.arcgisUrl + "/" + appid + "/data"', esri.arcgis.utils.arcgisUrl + "/" + appid + "/data");
-			var rq =  esriRequest({
-				url: esri.arcgis.utils.arcgisUrl + "/" + appid + "/data",
-					content:{
-						f:"json"
-					},
-					handleAs: "json"
-				});
-				rq.then(function(response) {
-					console.log('response', response);
-					for (var key in response.values){
-					console.log('response.values[key]', response.values[key]);
-					if(response.values[key]!==undefined) {
-						configOptions[key]=response.values[key];
-					}
-					}
-				});
+		function init () {
+				if (_embed){
+					$("#banner").hide();
+					$("#side-pane-buffer").hide();
+				}
+				if (_mobile){
+					_mobileLayout = new MobileLayout(onMobileListOpen);
+				}
+
+				Helper.enableRegionLayout();
+
+				if (configOptions.sharingUrl && location.protocol === "https:"){
+					configOptions.sharingUrl = configOptions.sharingUrl.replace('http:', 'https:');
+				}
+
+				if (configOptions.geometryServiceUrl && location.protocol === "https:"){
+					configOptions.geometryServiceUrl = configOptions.geometryServiceUrl.replace('http:', 'https:');
+				}
+
+				esri.arcgis.utils.arcgisUrl = configOptions.sharingUrl;
+				esri.config.defaults.io.proxyUrl = configOptions.proxyUrl;
+				esri.config.defaults.geometryServiceUrl = new GeometryService(configOptions.geometryServiceUrl);
+
+				var urlObject = esri.urlToObject(document.location.href);
+				urlObject.query = urlObject.query || {};
+
+				if(urlObject.query.webmap){
+					configOptions.webmap = urlObject.query.webmap;
+				}
+				
+				initSearchButtons();
+				cleanup();
+				
+				_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection),
+				_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch, _map);
+				
+				loadMap();
 		}
-
-		function init ()
-		{
 		
-			requestConfig();		
-			if (_embed){
-				$("#banner").hide();
-				$("#side-pane-buffer").hide();
-			}
-			if (_mobile){
-				_mobileLayout = new MobileLayout(onMobileListOpen);
-			}
-
-			Helper.enableRegionLayout();
-
-			if (configOptions.sharingUrl && location.protocol === "https:"){
-				configOptions.sharingUrl = configOptions.sharingUrl.replace('http:', 'https:');
-			}
-
-			if (configOptions.geometryServiceUrl && location.protocol === "https:"){
-				configOptions.geometryServiceUrl = configOptions.geometryServiceUrl.replace('http:', 'https:');
-			}
-
-			esri.arcgis.utils.arcgisUrl = configOptions.sharingUrl;
-			esri.config.defaults.io.proxyUrl = configOptions.proxyUrl;
-			esri.config.defaults.geometryServiceUrl = new GeometryService(configOptions.geometryServiceUrl);
-			//esri.config.defaults.io.useCors = false;
-
-			var urlObject = esri.urlToObject(document.location.href);
-			urlObject.query = urlObject.query || {};
-
-			if(urlObject.query.webmap){
-				configOptions.webmap = urlObject.query.webmap;
-			}
-			
-			_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection),
-			_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch, _map);
-			
-			loadMap();
-			
-			$(function(){
-			$( "#radio" ).buttonset();
-			
-			//Change _searchType based on the button that is selected
-			$("#projectNameRdBtn").click(function() {
-				_list.setSearchType($(this).attr("value"));
+		function initSearchButtons() {
+			$(function() {
+				$( "#radio" ).buttonset();
+				
+				//Change _searchType based on the button that is selected
+				$("#projectNameRdBtn").click(function() {
+					_list.setSearchType($(this).attr("value"));
+				});
+				$("#communityBoundaryRdBtn").click(function() {
+					_list.setSearchType($(this).attr("value"));
+				});
+				$("#wardsRdBtn").click(function() {
+					_list.setSearchType($(this).attr("value"));
+				});
+				
+				//Have Project Name Search Selected as default
+				$("#projectNameRdBtn").click();
 			});
-			$("#communityBoundaryRdBtn").click(function() {
-				_list.setSearchType($(this).attr("value"));
-			});
-			$("#wardsRdBtn").click(function() {
-				_list.setSearchType($(this).attr("value"));
-			});
-			});
+		}
+		function cleanup () {
+			//Perform any preload cleanup
 			
+			//Make Sure search is cleared on load
+			$("#search").val("");
 		}
 		
 		// MAP FUNCTIONS
 		
-		function loadMap()
-		{
+		function loadMap() {
 			Helper.updateLoadingMessage("Loading map");
 			_map.init();
-			
-			
 		}	
 
 		function onMapLoad(item)
@@ -149,7 +131,6 @@ define(["dojo/has",
 
 		function onLayersUpdate(graphics)
 		{
-		console.log('layers update', graphics);
 			if (_list){
 				updatePlaylist(graphics);
 			}
@@ -230,7 +211,6 @@ define(["dojo/has",
 
 		function onListSearch(items)
 		{
-		console.log('search event');
 			if(_map){
 				_map.filterGraphics(items);
 			}
@@ -252,11 +232,7 @@ define(["dojo/has",
 
 		function updateText(title,subtitle,description)
 		{	
-			console.log('update text...');
-			console.log(configOptions);
-			console.log(description);
 			var descriptionText = configOptions.description || description || "";
-			console.log(descriptionText);
 			document.title = configOptions.title || title || "";
 			$(".title-text").html(configOptions.title || title || "");
 			$(".subtitle-text").html(configOptions.subtitle || subtitle || "");
