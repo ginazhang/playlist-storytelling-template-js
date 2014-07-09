@@ -25,6 +25,13 @@
                     "placeholder": "Enter a subtitle for application."
                 },
                 {
+                    "type": "string",
+                    "fieldName": "imageLocation",
+                    "tooltip": "Thumbnail image location",
+                    "label": "Thumbnail image location:",
+                    "placeholder": "Enter the path where thumbnails should be read from."
+                },
+                {
                     "type": "webmap"
                 }
             ],
