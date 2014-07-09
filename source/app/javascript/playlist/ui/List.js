@@ -87,7 +87,7 @@ define([
 		};
 
 		function filterplaylistItems (result) {
-			
+			console.log('RRRRRRRRRRRRRR', result);
 			$(result).each(function(){
 				$(this).removeClass("hidden-search");
 			});
@@ -201,11 +201,15 @@ define([
 						defs.push(deferred.promise);
 						
 						query.geometry = geometryBoundary.geometry;
+						if(map.timeExtent) {
+							query.timeExtent = map.timeExtent;
+						}
+						
+						$(".playlist-item").addClass("hidden-search");
+						
 						layer.queryFeatures(query, lang.hitch(this, function(featureSet) {
 							if(featureSet.features && featureSet.features.length > 0) {
 								var items = [];
-								
-								$(".playlist-item").addClass("hidden-search");
 								
 								array.forEach(featureSet.features, function(feat) {
 									var item = {

@@ -177,21 +177,25 @@
 			// create new time extent
 			//set map time extent
 			//TODO: Make configurable
-//			var startTime = new Date("1/1/2000 UTC");
-			//var endTime = new Date("1/1/2020 UTC");
-//			var te = new TimeExtent();
-//			te.startDate = startTime;
-			console.log('creating time slider...');
-			var timeSlider = new TimeSlider({},dom.byId("TimeSliderDiv"));
-			timeSlider.setThumbCount(2);
+			var te = _map.getLayer(configOptions.projectLayerIds[0]).timeInfo.timeExtent;
+			if(te) {
+				//Create timeslider
+				_map.setTimeExtent(te);			
+				
+				var timeSlider = new TimeSlider({},dom.byId("TimeSliderDiv"));
+				
+				_map.setTimeSlider(timeSlider);
 
-//			console.log('_map',_map);
-			_map.setTimeSlider(timeSlider);
-			
-			
-//			timeSlider.createTimeStopsByCount(te, 20);
-			//timeSlider.createTimeStopsByTimeInterval(results[1].layer.timeInfo.timeExtent,1,'esriTimeUnitsWeeks');
-			timeSlider.startup();
+				timeSlider.createTimeStopsByTimeInterval(te,1,'esriTimeUnitsWeeks');//TODO Make customizable
+				timeSlider.setThumbCount(2);
+
+				timeSlider.startup();
+				
+				//Have full timeExtent visible
+				timeSlider.setThumbIndexes([0,timeSlider.timeStops.length]);
+			} else {
+				console.error("Unable to create timeslider");
+			}			
 		}
 		
 		function createBasemapToggle(map) {
