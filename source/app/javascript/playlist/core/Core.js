@@ -5,6 +5,8 @@ define(["dojo/has",
 	"storymaps/playlist/ui/Map",
 	"storymaps/playlist/ui/List",
 	"esri/config",
+	"dojo/Deferred",
+	"esri/arcgis/utils",
 	"lib/jquery-ui",
 	"lib/jquery-ui.min"
 	
@@ -15,7 +17,9 @@ define(["dojo/has",
 		MobileLayout,
 		Map,
 		List,
-		esriConfig
+		esriConfig,
+		Deferred,
+		arcgisUtils
 		
 		){
 
@@ -38,6 +42,28 @@ define(["dojo/has",
 		_layersReady = 0,
 		_map,
 		_list;
+		
+		function getConfigParams (urlObject) {
+			//Retreive config items from itemData stored on AGOL
+			var deferred = new Deferred();
+			//Check for appid
+			if(urlObject.query.appid) {
+				configOptions.appid = urlObject.query.appid;
+				arcgisUtils.getItem(configOptions.appid).then(function(response) {
+					//TODO: Add cases for options that are not strings
+					if(response && response.itemData && response.itemData.values) {
+						for(var key in response.itemData.values) {
+							configOptions[key] = response.itemData.values[key];
+						}
+					}
+					deferred.resolve();
+				});
+			} else {
+				//No appid, no need to overwrite params
+				deferred.resolve();
+			}
+			return deferred.promise;
+		}
 		
 		function init () {
 				if (_embed){
@@ -69,13 +95,16 @@ define(["dojo/has",
 					configOptions.webmap = urlObject.query.webmap;
 				}
 				
-				initSearchButtons();
-				cleanup();
-				
-				_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection),
-				_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch, _map);
-				
-				loadMap();
+				getConfigParams(urlObject).then(function() {
+					//Create map and list after configOptions is updated
+					_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection),
+					_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch, _map);
+					
+					initSearchButtons();
+					cleanup();
+					
+					loadMap();
+				});
 		}
 		
 		function initSearchButtons() {
