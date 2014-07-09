@@ -102,7 +102,7 @@ define([
 			if (searchSelector && _searchType){
 				$(searchSelector).autocomplete({
 					delay:2000,
-					source: function(request,response){
+					source: function(request){
 						var result;
 						//Determine search type based off of _searchType and search accordingly
 						if(_searchType =="attribute") {
@@ -215,7 +215,7 @@ define([
 									//Filter playlist based on the attributes(configOptions.dataFields.nameField) of the items
 									var regex = new RegExp($.ui.autocomplete.escapeRegex(feat.attributes[configOptions.dataFields.nameField]),"i");
 
-									result = $.grep($(".playlist-item"),function(el){
+									var result = $.grep($(".playlist-item"),function(el){
 										return ($(el).find(".item-title div").html().match(regex));
 									});
 									
