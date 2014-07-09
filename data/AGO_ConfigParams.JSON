@@ -8,7 +8,21 @@
                     "fieldName": "description",
                     "tooltip": "overview description",
                     "label": "description:",
-					"placeholder":"enter description"
+                    "placeholder": "enter description"
+                },
+                {
+                    "type": "string",
+                    "fieldName": "title",
+                    "tooltip": "Application Title",
+                    "label": "Title:",
+                    "placeholder": "Enter Title for Application."
+                },
+                {
+                    "type": "string",
+                    "fieldName": "subTitle",
+                    "tooltip": "Application Subtitle",
+                    "label": "Subtitle:",
+                    "placeholder": "Enter a subtitle for application."
                 },
                 {
                     "type": "webmap"
