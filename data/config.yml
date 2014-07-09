@@ -72,7 +72,7 @@ playlistPurpleIconURL: resources/images/markers/indexed/purple/IconPurple1.png
 # The web map id
 webmap: 819abe4373a0412ba6d9917f0bf6af8a
 #AGOL appid
-appid: b2a4548d784f40fb8644552e3369ff13
+appid: ""
 # Choose name field
 nameField: "Project_Name"
 # Choose image field
