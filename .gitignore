@@ -231,3 +231,6 @@ sftp-config-alt.json
 ## Node Modules
 #############
 node_modules/
+/deploy/
+/Playlist_DevloperDownload.zip
+/Playlist.zip
