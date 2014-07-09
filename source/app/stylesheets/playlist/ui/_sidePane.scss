@@ -230,6 +230,9 @@ body{
 	.toggle-description, .toggle-legend{
 		display: none;
 	}
+	.toggle-legend {
+		display:block;
+	}
 
 	.icon-left-arrow{
 		display: none !important;;
@@ -247,15 +250,18 @@ body{
 		height: auto;
 		width: 56px;
 	}
+	&#legendAndSources{	
+	background-color:transparent;
+	}
 
 }
 #legendAndSources {
+background-color: $gray;
 top:165px !important;
 left:315px !important;
 height:100% ;
 width:300px !important;
 z-index:100;
-background-color:white;
 }
 
 #toggleLegend{
@@ -264,6 +270,22 @@ background-color: $gray;
 	padding: 5px 0;
 	height: 26px;
 }
+
+#toggleLegend h1{
+    color: white;
+	padding-left: 55px;
+	letter-spacing: 1px;
+    font-weight: bold;
+	font-size: 14px;
+	font-family: "Arial Black", Gadget, sans-serif;
+}
+
+#basemapToggleDiv {
+      position: absolute;
+      top: 20px;
+      right: 100px;
+      z-index: 50;
+    }
 
 #searchRadioContainer {
 width:320px;
@@ -277,6 +299,10 @@ height:100%;
 
 }
 
-.closed{
-height:26px;
-}
+.show-legend{
+		&#legendAndSources {
+		background-color: $gray;
+		}
+	}
+
+

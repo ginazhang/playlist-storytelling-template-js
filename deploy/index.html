@@ -165,18 +165,18 @@
 					</div>					
 			</div>
 			<div id="searchRadioContainer">
-			<form>
-				<div id="radio" >
-				<input type="radio" id="projectNameRdBtn" name="project" value="attribute" checked="checked">
-				<label for="projectNameRdBtn">Project Name</label>
-				<input type="radio" id="communityBoundaryRdBtn" name="project" value="communityBoundary">
-				<label for="communityBoundaryRdBtn">Community Boundary </label>
-				<input type="radio" id="wardsRdBtn" name="project" value="wards">
-				<label for="wardsRdBtn">Wards</label>
-				</div>
-			</form>
+				<form>
+					<div id="radio" >
+						<input type="radio" id="projectNameRdBtn" name="project" value="attribute" checked="checked">
+						<label for="projectNameRdBtn">Project Name</label>
+						<input type="radio" id="communityBoundaryRdBtn" name="project" value="communityBoundary">
+						<label for="communityBoundaryRdBtn">Community Boundary </label>
+						<input type="radio" id="wardsRdBtn" name="project" value="wards">
+						<label for="wardsRdBtn">Wards</label>
+					</div>
+				</form>
 			</div>	
-			<div id="TimeSliderDiv" class="region-right"></div>		
+			<div id="TimeSliderDiv"></div>		
 		</div>
 		<div id="mobile-controls" class="region-right">
 			<span class="icon-open-book playlist-control toggle-description"></span>
@@ -246,7 +246,7 @@
 			description: "",
 			communityWardsServiceUrl: "http://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/NEORSD_Cleveland_Wards/FeatureServer/0/",
 			communityBoundaryServiceUrl: "https://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/Jurisdiction/FeatureServer/0",
-			appid:"b2a4548d784f40fb8644552e3369ff13",
+			appid:"",
 			// Choose data fields
 			dataFields: {
 				// Change name field to match data
@@ -298,9 +298,12 @@
 				}
 			},
 			// Add the layer names of valid point layers that should be excluded from the playlist and used as reference layers
-			excludedLayers: ["Community Boundary", "Wards"],
+			excludedLayers: ["Community Boundary", "Cleveland Ward"],
+			projectLayerIds: ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"],
 			// If the webmap uses Bing Maps data, you will need to provided your Bing Maps Key
 			bingMapsKey: "",
+			//Path to thumbnail images
+			imageLocation :"http://arcgis.neorsd.org/storymaps/resources/THUMBNAILS/",
 			// Specify a proxy for custom deployment
 			proxyUrl: "../ArcGISWebAppProxy/proxy.ashx",
 			// Specify the url to a geometry service
