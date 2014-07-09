@@ -87,6 +87,8 @@ define(["dojo/has",
 				esri.arcgis.utils.arcgisUrl = configOptions.sharingUrl;
 				esri.config.defaults.io.proxyUrl = configOptions.proxyUrl;
 				esri.config.defaults.geometryServiceUrl = new GeometryService(configOptions.geometryServiceUrl);
+				esriConfig.defaults.io.corsEnabledServers.push("services1.arcgis.com");
+
 
 				var urlObject = esri.urlToObject(document.location.href);
 				urlObject.query = urlObject.query || {};
