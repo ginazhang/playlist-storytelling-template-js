@@ -9,6 +9,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 	"dojo/query",
 	"dojo/dom-geometry",
 	"esri/geometry/ScreenPoint",
+	"esri/TimeExtent",
 	"dojo/on",
 	"dojo/has",
 	"dojo/_base/array",
@@ -36,6 +37,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 		query,
 		domGeom,
 		ScreenPoint,
+		TimeExtent,
 		on,
 		has,
 		array,
@@ -169,11 +171,25 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			});
 		};
 		function createTimeSlider() {
+			//Go through all features in project layers
+			//Get end date
+			//get start date
+			// create new time extent
+			//set map time extent
+			//TODO: Make configurable
+			var startTime = new Date("1/1/2000 UTC");
+			//var endTime = new Date("1/1/2020 UTC");
+//			var te = new TimeExtent();
+//			te.startDate = startTime;
+			console.log('creating time slider...');
 			var timeSlider = new TimeSlider({},dom.byId("TimeSliderDiv"));
-			_map.setTimeSlider(timeSlider);  
+			timeSlider.setThumbCount(2);
+
+//			console.log('_map',_map);
+			_map.setTimeSlider(timeSlider);
 			
 			
-			timeSlider.setThumbCount(1);
+//			timeSlider.createTimeStopsByCount(te, 20);
 			//timeSlider.createTimeStopsByTimeInterval(results[1].layer.timeInfo.timeExtent,1,'esriTimeUnitsWeeks');
 			timeSlider.startup();
 		}
@@ -291,9 +307,9 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			hideMapTip();
 		};
 
-		this.filterGraphics = function(items)
-		{
-			array.forEach(_playlistLayers,function(lyr){
+		this.filterGraphics = function(items) {
+			
+			array.forEach(_playlistLayers,function(lyr) {
 				var layerObj = _map.getLayer(lyr.layerId);
 				if (!items){
 					layerObj.hide();
@@ -467,11 +483,13 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 					
 					var symbol = renderer.getSymbol(grp);
 					
+					var imageUrl = configOptions.imageLocation + grp.attributes[configOptions.dataFields.imageField] + ".png";
 					var item = {
 						layerId: layerObj.id,
 						objectIdField: layerObj.objectIdField,
 						graphic: grp,
 						iconURL: symbol.url,
+						thumbnailUrl: imageUrl,
 						filter: grp.attributes[dataFields.filterField]
 					};
 					lyrItems.push(item);

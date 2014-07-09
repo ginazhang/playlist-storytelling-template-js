@@ -42,8 +42,7 @@ define([
 		
 		this.setSearchType = function (searchType) {
 			//Sets _searchType
-			_searchType = searchType;
-			console.log('search type set to : ', searchType);			
+			_searchType = searchType;			
 		};
 
 		this.update = function(lyrItems)
@@ -252,12 +251,8 @@ define([
 		
 		function buildList(lyrItems)
 		{
-		console.log('buildList', lyrItems);
 			for (var layerId in lyrItems){
-				console.log('layerId', layerId);
 				var items = lyrItems[layerId];
-				//console.log('items', items);
-				console.log('items[0].graphic.attributes', items[0].graphic.attributes);
 				var attr = getAttributeNames(items[0].graphic.attributes);
 				var titleAttr = {
 					layerId: layerId,
@@ -265,7 +260,6 @@ define([
 				};
 				onGetTitleField(titleAttr);
 				array.forEach(items,function(item){
-				console.log('item',item);
 					var objId = item.graphic.attributes[item.objectIdField];
 					var itemStr = "";
 					if (attr.thumbnail){
@@ -278,7 +272,7 @@ define([
 												<img src=' + item.iconURL + ' alt="" class="marker" />\
 											</td>\
 											<td class="thumbnail-cell">\
-												<div class="thumbnail-container" style="background-image: url(' + item.graphic.attributes[attr.thumbnail] + '); filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="' + item.graphic.attributes[attr.thumbnail] + '", sizingMethod="scale");"></div>\
+												<div class="thumbnail-container" style="background-image: url(' + item.thumbnailUrl + '); filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="' + item.graphic.attributes[attr.thumbnail] + '", sizingMethod="scale");"></div>\
 											</td>\
 											<td class="title-cell">\
 												<h6 class="item-title">' + item.graphic.attributes[window.configOptions.dataFields.nameField] + '</h6>\
@@ -409,8 +403,7 @@ define([
 			onSearch(items);
 		}
 
-		function getAttributeNames(obj)
-		{
+		function getAttributeNames(obj) {
 			var attrNames = {},
 			udrScr = new RegExp (/"_"/i),
 			url = new RegExp (/http/i),
@@ -469,17 +462,13 @@ define([
 					}
 				}
 			}
-
 			if (dataFields.imageField){
 				attrNames.thumbnail = dataFields.imageField;
 			}
 			if (dataFields.nameField){
 				attrNames.title = dataFields.nameField;
 			}
-
 			return attrNames;
 		}
-
 	};
-
 });
