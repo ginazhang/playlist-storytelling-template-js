@@ -1,4 +1,4 @@
-define(["storymaps/playlist/config/MapConfig","esri/map",
+﻿define(["storymaps/playlist/config/MapConfig","esri/map",
 	"esri/arcgis/utils",
 	"esri/dijit/Legend",
 	"esri/dijit/Popup",
@@ -177,7 +177,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			// create new time extent
 			//set map time extent
 			//TODO: Make configurable
-			var startTime = new Date("1/1/2000 UTC");
+//			var startTime = new Date("1/1/2000 UTC");
 			//var endTime = new Date("1/1/2020 UTC");
 //			var te = new TimeExtent();
 //			te.startDate = startTime;
@@ -385,9 +385,7 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			var layerIds = [];
 			var playlistLayers = [];
 			array.forEach(layers,function(layer){
-			console.log('layer is : ', layer);
 				if (layer.featureCollection && layer.featureCollection.layers.length > 0){
-				console.log('feature collection');
 					array.forEach(layer.featureCollection.layers,function(l){
 						if ( l.visibility && checkExcluded(l.layerObject.name)){
 							var playlistLyr = l.layerObject;
@@ -406,7 +404,6 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 					});
 				}
 				else if(layer.url && layer.resourceInfo.type === "Feature Layer" && layer.visibility && checkExcluded(layer.layerObject.name)){
-				console.log('feature layer');
 					var playlistLyr = layer.layerObject;
 					playlistLayers.push(playlistLyr);
 					playlistLyr.mode = 0;
@@ -473,8 +470,6 @@ define(["storymaps/playlist/config/MapConfig","esri/map",
 			var maxPoints = _mapConfig.getMaxAllowablePoints();
 			
 			if(renderer) {
-			//renderer = new SimpleRenderer();
-			//layerObj.setRenderer(renderer);
 			var s = new SimpleLineSymbol(renderer.symbol.style, renderer.symbol.color, renderer.symbol.width);
 			renderer =  new SimpleRenderer(s);
 			
