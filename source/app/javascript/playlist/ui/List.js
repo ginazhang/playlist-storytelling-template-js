@@ -30,7 +30,7 @@ define([
 	* Dependencies: Jquery 1.10.2
 	*/
 
-	return function List(selector,searchSelector,filterSelector,dataFields,onLoad,onGetTitleField,onSelect,onHighlight,onRemoveHightlight,onSearch)
+	return function List(selector,searchSelector,filterSelector,dataFields,onLoad,onGetTitleField,onSelect,onHighlight,onRemoveHightlight,onSearch, filterplaylistItems)
 	{
 		var _listEl = $(selector),
 		_filterSet = [],
@@ -86,16 +86,6 @@ define([
 			$(".playlist-item").removeClass("selected");
 		};
 
-		function filterplaylistItems (result) {
-			console.log('RRRRRRRRRRRRRR', result);
-			$(result).each(function(){
-				$(this).removeClass("hidden-search");
-			});
-			$("#search-submit").addClass("icon-close").removeClass("icon-search");
-			if(_searchType =="attribute") {
-				setItemResults();
-			}			
-		}
 		
 		function addSearchEvents()
 		{
@@ -107,18 +97,33 @@ define([
 						//Determine search type based off of _searchType and search accordingly
 						if(_searchType =="attribute") {
 						//Handle Project Name Search
-						var regex = new RegExp($.ui.autocomplete.escapeRegex(request.term),"i");
-
-						result = $.grep($(".playlist-item"),function(el){
-							return ($(el).find(".item-title div").html().match(regex));
+						var titles = [];
+						var map = kernel.global.map;
+						array.forEach(configOptions.projectLayerIds, function(id) {
+							//Cycle through all available graphics
+							//	Note: should be filtered based on time if layer is time aware
+							var layer = map.getLayer(id);
+							if(layer) {
+								array.forEach(layer.graphics, function(graphic) {
+									var title = graphic.attributes[configOptions.dataFields.nameField];
+									titles.push(title);
+								});
+							}
 						});
-
-						_searchResults = result;
-						
 						$(".playlist-item").addClass("hidden-search");
 						
-						filterplaylistItems(result);
-						
+						array.forEach(titles, lang.hitch(this, function(title) {
+							var regex = new RegExp($.ui.autocomplete.escapeRegex(request.term),"i");
+							if(title.match(regex)) {
+								//
+								regex = new RegExp($.ui.autocomplete.escapeRegex(title),"i");
+								result = $.grep($(".playlist-item"),function(el){
+									return ($(el).find(".item-title div").html().match(regex));
+								});
+								_searchResults = result;
+								filterplaylistItems(result);
+							}							
+						}));
 						} else if (_searchType == "communityBoundary") {
 							//Handle Community Boundary Search
 							prepareQT(window.configOptions.communityBoundaryServiceUrl, request.term, "NAME");				

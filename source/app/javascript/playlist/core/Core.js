@@ -99,14 +99,24 @@ define(["dojo/has",
 				
 				getConfigParams(urlObject).then(function() {
 					//Create map and list after configOptions is updated
-					_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection),
-					_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch, _map);
+					_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection,filterplaylistItems),
+					_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch,filterplaylistItems);
 					
 					initSearchButtons();
 					cleanup();
 					
 					loadMap();
 				});
+		}
+		
+		function filterplaylistItems (result) {
+			$(result).each(function(){
+				$(this).removeClass("hidden-search");
+			});
+			$("#search-submit").addClass("icon-close").removeClass("icon-search");
+			if(_list._searchType =="attribute") {
+				_list.setItemResults();
+			}			
 		}
 		
 		function initSearchButtons() {
