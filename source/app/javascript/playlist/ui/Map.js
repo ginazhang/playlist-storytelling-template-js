@@ -256,7 +256,6 @@
 		
 		function createBasemapToggle(map) {
 			var basemapToggle = new BasemapToggle({
-				theme: "basemapToggle",
 				map: map,
 				visible: true,
 				basemap: "streets"

@@ -56,7 +56,13 @@
 	vertical-align: top;
 }
 #TimeSliderDiv {
-width:600px;
-left:630px;
-position:absolute;
+	width:600px;
+	left:630px;
+	position:absolute;
+}
+#basemapToggleDiv {
+	right:75px;
+	top:20px;
+	z-index:50;
+	position:absolute;
 }
