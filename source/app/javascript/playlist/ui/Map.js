@@ -118,6 +118,18 @@
 						});
 					});
 				});
+				//Fix for basemaps so that togglebasemaps dijit will work
+				//TODO: Add all ESRI basemap strings
+				var basemapHash = {
+						"National Geographic":"national-geographic"	
+				};
+				var basemapTitle = response.itemInfo.itemData.baseMap.title;
+				array.forEach(response.itemInfo.itemData.baseMap.baseMapLayers, function(bm) {
+					_map.removeLayer(bm.layerObject);
+				});
+				_map.setBasemap(basemapHash[basemapTitle]);
+				
+				
 				_map.centerAt(getOffsetCenter(_map.extent.getCenter()));
 
 				if(_map.loaded){
