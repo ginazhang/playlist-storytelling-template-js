@@ -80,6 +80,7 @@ body{
 
 	&.show-legend #legend-pane{
 		display: block;
+		background-color:$gray;
 	}
 
 	&.show-description #description{
@@ -227,8 +228,12 @@ body{
 
 .minimized{
 
-	.toggle-description, .toggle-legend{
+	.toggle-description{
 		display: none;
+	}
+
+	.toggle-legend{
+	    display:block;
 	}
 
 	.icon-left-arrow{
@@ -248,28 +253,48 @@ body{
 		width: 56px;
 	}
 
+	&#legendAndSources{
+	background-color:transparent;
+	}
+
+	
 }
+
 #legendAndSources {
-top:165px !important;
-left:315px !important;
-height:100% ;
-width:300px !important;
-z-index:100;
-background-color:white;
+	background-color: $gray;
+	top:165px !important;
+	left:315px !important;
+	width:300px !important;
+	z-index:100;
 }
 
 #toggleLegend{
-background-color: $gray;
+	background-color: $gray;
 	width: 100%;
 	padding: 5px 0;
-	height: 26px;
+	height: 26px;	
 }
 
+#toggleLegend h1{
+    color: white;
+	padding-left: 55px;
+	letter-spacing: 1px;
+    font-weight: bold;
+	font-size: 14px;
+	font-family: "Arial Black", Gadget, sans-serif;
+}
+
+#basemapToggleDiv {
+      position: absolute;
+      top: 20px;
+      right: 100px;
+      z-index: 50;
+    }
+
 #searchRadioContainer {
-width:320px;
+width:20%;
 margin-left:315px;
 font-size:10px;
-position:absolute;
 }
 
 .expanded{
@@ -277,6 +302,16 @@ height:100%;
 
 }
 
-.closed{
-height:26px;
+.show-legend{
+		&#legendAndSources {
+		background-color: $gray;
+		}
+	}
+
+
+.dijitDialogPaneContent {
+    width: 300px !important;
+    height: 200px !important;
 }
+
+

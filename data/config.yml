@@ -79,6 +79,8 @@ nameField: "Project_Name"
 imageField: "Oracle_Project__"
 # Choose image location
 imageLocation: "http://arcgis.neorsd.org/storymaps/resources/THUMBNAILS/"
+# Choose icon marker location
+playListMarkerIconLocationUrl: "http://arcgis.neorsd.org/storymaps/resources/markers/red/"
 # Choose color field
 colorField: ""
 # Choose order field
