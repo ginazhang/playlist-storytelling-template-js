@@ -60,7 +60,7 @@
 	* Class to define a new map for the playlist template
 	*/
 
-	return function PlaylistMap(isMobile,geometryServiceURL,bingMapsKey,webmapId,excludedLayers,dataFields,displayLegend,playlistLegendConfig,mapSelector,playlistLegendSelector,legendSelector,sidePaneSelector,onLoad,onHideLegend,onListItemRefresh,onHighlight,onRemoveHighlight,onSelect,onRemoveSelection)
+	return function PlaylistMap(isMobile,geometryServiceURL,bingMapsKey,webmapId,excludedLayers,dataFields,displayLegend,playlistLegendConfig,mapSelector,playlistLegendSelector,legendSelector,sidePaneSelector,onLoad,onHideLegend,onListItemRefresh,onHighlight,onRemoveHighlight,onSelect,onRemoveSelection,filterplaylistItems)
 	{
 		var _mapConfig = new MapConfig(),
 		_map,
@@ -130,7 +130,6 @@
 					on(_map,"loaded",function(){
 						getPointLayers(response.itemInfo.itemData.operationalLayers);
 						//Create time slider 
-						//
 						createBasemapToggle(_map);
 						createTimeSlider();
 					
@@ -193,6 +192,51 @@
 				
 				//Have full timeExtent visible
 				timeSlider.setThumbIndexes([0,timeSlider.timeStops.length]);
+				
+				_map.on("time-extent-change", function() {
+					var searchTerm = $("#search").val();
+					var titles = [];
+					var map = kernel.global.map;
+					var result, regex;
+					array.forEach(configOptions.projectLayerIds, function(id) {
+						//Cycle through all available graphics
+						//	Note: should be filtered based on time if layer is time aware
+						var layer = map.getLayer(id);
+						if(layer) {
+							var updateHandler = on(layer, "update-end", function() {
+								updateHandler.remove();
+								array.forEach(layer.graphics, function(graphic) {
+									var title = graphic.attributes[configOptions.dataFields.nameField];
+									titles.push(title);
+								});
+								$(".playlist-item").addClass("hidden-search");
+								if(searchTerm === "") {
+									//No current search
+									//show all
+									array.forEach(titles, function(title) {
+										regex = new RegExp($.ui.autocomplete.escapeRegex(title),"i");
+										result = $.grep($(".playlist-item"),function(el){
+												return ($(el).find(".item-title div").html().match(regex));
+										});
+										filterplaylistItems(result);						
+									});
+								} else {
+									array.forEach(titles, function(title) {
+										regex = new RegExp($.ui.autocomplete.escapeRegex(searchTerm),"i");
+										if(title.match(regex)) {
+											//
+											regex = new RegExp($.ui.autocomplete.escapeRegex(title),"i");
+											result = $.grep($(".playlist-item"),function(el){
+												return ($(el).find(".item-title div").html().match(regex));
+											});
+											filterplaylistItems(result);
+										}							
+									});	
+								}
+							});	
+						}
+					});					
+				});
 			} else {
 				console.error("Unable to create timeslider");
 			}			
