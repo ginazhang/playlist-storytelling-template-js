@@ -7,6 +7,7 @@ define(["dojo/has",
 	"esri/config",
 	"dojo/Deferred",
 	"esri/arcgis/utils",
+	"dijit/Dialog",
 	"lib/jquery-ui",
 	"lib/jquery-ui.min"
 	
@@ -19,7 +20,8 @@ define(["dojo/has",
 		List,
 		esriConfig,
 		Deferred,
-		arcgisUtils
+		arcgisUtils,
+		Dialog
 		
 		){
 
@@ -98,6 +100,16 @@ define(["dojo/has",
 				}
 				
 				getConfigParams(urlObject).then(function() {
+					//Spash Dialog
+					if(configOptions.displaySplash) { //TODO: Add to Config
+						var splashDialog = new Dialog({
+							title:"What is Project Clean Lake?",
+							content:configOptions.splashContent,
+							style:"width:500px"
+						});
+						splashDialog.show();
+					}
+					
 					//Create map and list after configOptions is updated
 					_map = new Map(_mobile,configOptions.geometryServiceUrl,configOptions.bingMapsKey,configOptions.webmap,configOptions.excludedLayers,configOptions.dataFields,configOptions.playlistLegend.visible,configOptions.playlistLegend,"map","playlist-legend","legend","#side-pane",onMapLoad,onMapLegendHide,onLayersUpdate,onMarkerOver,onMarkerOut,onMarkerSelect,onMarkerRemoveSelection,filterplaylistItems),
 					_list = new List("#playlist","#search","#filter-content",configOptions.dataFields,onListLoad,onListGetTitleAttr,onListSelect,onListHighlight,onListRemoveHighlight,onListSearch,filterplaylistItems);
