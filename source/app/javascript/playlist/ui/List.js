@@ -278,7 +278,7 @@ define([
 									<tbody>\
 										<tr>\
 											<td class="marker-cell">\
-												  <img src=' + window.configOptions.playListMarkerIconLocationUrl + 'NumberIcon' + objId + '.png alt="" class="marker" />\
+												<img src=' + window.configOptions.playListMarkerIconLocationUrl + 'NumberIcon' + objId + '.png alt="" class="marker" />\
 											</td>\
 											<td class="thumbnail-cell">\
 												<div class="thumbnail-container" style="background-image: url(' + item.thumbnailUrl + '); filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="' + item.graphic.attributes[attr.thumbnail] + '", sizingMethod="scale");"></div>\

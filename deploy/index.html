@@ -165,18 +165,18 @@
 					</div>					
 			</div>
 			<div id="searchRadioContainer">
-			<form>
-				<div id="radio" >
-				<input type="radio" id="projectNameRdBtn" name="project" value="attribute" checked="checked">
-				<label for="projectNameRdBtn">Project Name</label>
-				<input type="radio" id="communityBoundaryRdBtn" name="project" value="communityBoundary">
-				<label for="communityBoundaryRdBtn">Community Boundary </label>
-				<input type="radio" id="wardsRdBtn" name="project" value="wards">
-				<label for="wardsRdBtn">Wards</label>
-				</div>
-			</form>
+				<form>
+					<div id="radio" >
+						<input type="radio" id="projectNameRdBtn" name="project" value="attribute" checked="checked">
+						<label for="projectNameRdBtn">Project Name</label>
+						<input type="radio" id="communityBoundaryRdBtn" name="project" value="communityBoundary">
+						<label for="communityBoundaryRdBtn">Community Boundary </label>
+						<input type="radio" id="wardsRdBtn" name="project" value="wards">
+						<label for="wardsRdBtn">Wards</label>
+					</div>
+				</form>
 			</div>	
-			<div id="TimeSliderDiv" class="region-right"></div>		
+			<div id="TimeSliderDiv"></div>		
 		</div>
 		<div id="mobile-controls" class="region-right">
 			<span class="icon-open-book playlist-control toggle-description"></span>
@@ -185,9 +185,10 @@
 		</div>
 	
 	</div><!--/banner-->
-	<div id="legendAndSources" class="region-center closed">
-		<div id="toggleLegend">
-			<span class="icon-list-2 playlist-control toggle-legend" title="Toggle Legend"></span>
+	<div id="legendAndSources" class="region-center minimized">
+		<div id="toggleLegend" class="region-top">
+		<h1>      Legend&Source</h1>
+			<span class="icon-list-2 playlist-control toggle-legend" title="Toggle Legend"></span>			
 		</div>
 			<div id="legend-pane">
 					<div id="playlist-legend" class="legend"></div>
@@ -196,6 +197,7 @@
 	</div>
 	<div id="map-pane" class="region-center">
 		<div id="map" class="region-center">
+			<div id="basemapToggleDiv"></div>
 		</div>
 		<div id="mobile-swipe-toggle" class="icon-right-arrow"></div>
 		<div id="map-blind"></div>
@@ -246,7 +248,9 @@
 			description: "",
 			communityWardsServiceUrl: "http://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/NEORSD_Cleveland_Wards/FeatureServer/0/",
 			communityBoundaryServiceUrl: "https://services1.arcgis.com/SPFcZzbZkZvJ7Vki/arcgis/rest/services/Jurisdiction/FeatureServer/0",
-			appid:"b2a4548d784f40fb8644552e3369ff13",
+			appid:"",
+			imageLocationUrl: "",
+			playListMarkerIconLocationUrl: "http://arcgis.neorsd.org/storymaps/resources/markers/red/",
 			// Choose data fields
 			dataFields: {
 				// Change name field to match data
@@ -298,9 +302,14 @@
 				}
 			},
 			// Add the layer names of valid point layers that should be excluded from the playlist and used as reference layers
-			excludedLayers: ["Community Boundary", "Wards"],
+			excludedLayers: ["Community Boundary", "Cleveland Ward"],
+			projectLayerIds: ["NEORSD_CIP_Projects_6880", "NEORSD_CIP_Projects_7893"],
+			splashContent: "Project Clean Lake is a $3 billion, 25-year program to meet Clean Water Act standards and address water quality issues caused by sewage overflows that enter the environment. When finished, over 98% of wet weather flows in our combined sewer system will be receiving treatment.  Project Clean Lake consists of the following projects:<br /><strong class='bold'>&quot;Gray&quot; infrastructure: Storage Tunnels</strong><br>Seven tunnels will be constructed, ranging from two to five miles in length, up to 300 feet underground and up to 24 feet in diameter.  These tunnels are like the Mill Creek Tunnel, a structure with the capacity to store 75 million gallons of combined sewage for treatment at the Sewer District's Southerly Wastewater Treatment Plant.<br><strong class='bold'>Infrastructure: Treatment Plant Enhancements</strong><br>At the Easterly and Southerly plants, the maximum amount of wastewater that can receive secondary treatment will increase. At the Westerly plant, the maximum amount of treatment that can take place at the District's Combined Sewer Overflow Treatment Facility will increase.<br><strong class='bold'>Green Infrastructure and Stormwater Control Measures</strong><br>Project Clean Lake includes over $80 million in green infrastructure projects. This includes stormwater control measures (or SCMs) to store, infiltrate, and evapotranspirate stormwater before it enters the combined sewer system.<br>",
+			displaySplash: "true",
 			// If the webmap uses Bing Maps data, you will need to provided your Bing Maps Key
 			bingMapsKey: "",
+			//Path to thumbnail images
+			imageLocation :"http://arcgis.neorsd.org/storymaps/resources/THUMBNAILS/",
 			// Specify a proxy for custom deployment
 			proxyUrl: "../ArcGISWebAppProxy/proxy.ashx",
 			// Specify the url to a geometry service
