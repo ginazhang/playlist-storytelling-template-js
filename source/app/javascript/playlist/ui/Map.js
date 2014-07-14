@@ -317,7 +317,9 @@
 				}
 
 				if (!has("ie")){
-					graphic.getDojoShape().moveToFront();
+					if(graphic.getShape()) {
+						graphic.getShape().moveToFront();
+					}					
 				}				
 			});
 		};
@@ -338,15 +340,16 @@
 					_lastHightlighedGraphic = graphic;
 
 					if (graphic.getNode() && domGeom.position(graphic.getNode()).x > getSidePanelWidth()){
-						
-						var newSym = layer.renderer.getSymbol(graphic).setWidth(_mapConfig.getMarkerPositionHighlight().width).setHeight(_mapConfig.getMarkerPositionHighlight().height).setOffset(_mapConfig.getMarkerPositionHighlight().xOffset,_mapConfig.getMarkerPositionHighlight().yOffset);
-						
-						graphic.setSymbol(newSym);
-						if (!has("ie")){
-							graphic.getDojoShape().moveToFront();
-						}
+						var s =  layer.renderer.getSymbol(graphic);
+						if(s.getHeight && s.setWidth) {
+							var newSym = s.setWidth(_mapConfig.getMarkerPositionHighlight().width).setHeight(_mapConfig.getMarkerPositionHighlight().height).setOffset(_mapConfig.getMarkerPositionHighlight().xOffset,_mapConfig.getMarkerPositionHighlight().yOffset);
+							graphic.setSymbol(newSym);
+							if (!has("ie")){
+								graphic.getDojoShape().moveToFront();
+							}
 
-						showMapTip(graphic,titleAttr);
+							showMapTip(graphic,titleAttr);
+						}
 					}
 					
 				});
@@ -359,8 +362,12 @@
 			if (graphic){
 				var layer = graphic.getLayer();
 				if (layer){
-					var newSym = layer.renderer.getSymbol(graphic).setWidth(_mapConfig.getMarkerPosition().width).setHeight(_mapConfig.getMarkerPosition().height).setOffset(_mapConfig.getMarkerPosition().xOffset,_mapConfig.getMarkerPosition().yOffset);
-					graphic.setSymbol(newSym);
+					var s =  layer.renderer.getSymbol(graphic);
+					if(s.getHeight && s.setWidth) {
+						var newSym = layer.renderer.getSymbol(graphic).setWidth(_mapConfig.getMarkerPosition().width).setHeight(_mapConfig.getMarkerPosition().height).setOffset(_mapConfig.getMarkerPosition().xOffset,_mapConfig.getMarkerPosition().yOffset);
+						graphic.setSymbol(newSym);
+					}
+					
 				}
 			}
 			hideMapTip();
@@ -665,36 +672,43 @@
 			if(!has("touch")){
 				
 				on(layer,"mouse-over",function(event){
-					var newSym = layer.renderer.getSymbol(event.graphic).setWidth(_mapConfig.getMarkerPositionHighlight().width).setHeight(_mapConfig.getMarkerPositionHighlight().height).setOffset(_mapConfig.getMarkerPositionHighlight().xOffset,_mapConfig.getMarkerPositionHighlight().yOffset);
-					var item = {
-						layerId: event.graphic.getLayer().id,
-						objectId: event.graphic.attributes[event.graphic.getLayer().objectIdField]
-					};
-					var titleAttr = _titleFields[event.graphic.getLayer().id];
-					_lastHightlighedGraphic = event.graphic;
-					event.graphic.setSymbol(newSym);
-					if (!has("ie")){
-						event.graphic.getDojoShape().moveToFront();
+					var s = layer.renderer.getSymbol(event.graphic);
+					if(s.setWidth && s.setHeight) {
+						var newSym = layer.renderer.getSymbol(event.graphic).setWidth(_mapConfig.getMarkerPositionHighlight().width).setHeight(_mapConfig.getMarkerPositionHighlight().height).setOffset(_mapConfig.getMarkerPositionHighlight().xOffset,_mapConfig.getMarkerPositionHighlight().yOffset);
+						var item = {
+							layerId: event.graphic.getLayer().id,
+							objectId: event.graphic.attributes[event.graphic.getLayer().objectIdField]
+						};
+						var titleAttr = _titleFields[event.graphic.getLayer().id];
+						_lastHightlighedGraphic = event.graphic;
+						event.graphic.setSymbol(newSym);
+						if (!has("ie")){
+							event.graphic.getDojoShape().moveToFront();
+						}
+						_map.setCursor("pointer");
+
+						showMapTip(event.graphic,titleAttr);
+
+						onHighlight(item);
 					}
-					_map.setCursor("pointer");
-
-					showMapTip(event.graphic,titleAttr);
-
-					onHighlight(item);
+					
 				});
 
 				on(layer,"mouse-out",function(event){
-					var newSym = layer.renderer.getSymbol(event.graphic).setWidth(_mapConfig.getMarkerPosition().width).setHeight(_mapConfig.getMarkerPosition().height).setOffset(_mapConfig.getMarkerPosition().xOffset,_mapConfig.getMarkerPosition().yOffset);
-					var item = {
-						layerId: event.graphic.getLayer().id,
-						objectId: event.graphic.attributes[event.graphic.getLayer().objectIdField]
-					};
-					event.graphic.setSymbol(newSym);
-					_map.setCursor("default");
+					var s = layer.renderer.getSymbol(event.graphic);
+					if(s.setWidth && s.setHeight) {
+						var newSym = layer.renderer.getSymbol(event.graphic).setWidth(_mapConfig.getMarkerPosition().width).setHeight(_mapConfig.getMarkerPosition().height).setOffset(_mapConfig.getMarkerPosition().xOffset,_mapConfig.getMarkerPosition().yOffset);
+						var item = {
+							layerId: event.graphic.getLayer().id,
+							objectId: event.graphic.attributes[event.graphic.getLayer().objectIdField]
+						};
+						event.graphic.setSymbol(newSym);
+						_map.setCursor("default");
 
-					hideMapTip();
+						hideMapTip();
 
-					onRemoveHighlight(item);
+						onRemoveHighlight(item);
+					}					
 				});
 
 			}
@@ -742,6 +756,9 @@
 				var newPt = geo.offset(offsetX,offsetY);
 
 				_map.centerAt(newPt);
+			} else if(geo.type == "polygon") {
+				var center = geo.getCentroid();
+				_map.centerAt(center);
 			}
 		}
 
@@ -752,9 +769,10 @@
 			if (newLocation){
 				location = newLocation;
 			}
-
+			
+			_map.setExtent(graphic.geometry.getExtent().expand(2));
 			_map.infoWindow.setFeatures([graphic]);
-			_map.infoWindow.show(location);
+			_map.infoWindow.show(graphic.geometry.getExtent().getCenter());
 		}
 
 		function showMapTip(graphic,titleAttr)
