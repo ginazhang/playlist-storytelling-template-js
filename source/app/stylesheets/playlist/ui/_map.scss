@@ -56,13 +56,18 @@
 	vertical-align: top;
 }
 #TimeSliderDiv {
-	width:600px;
-	left:630px;
-	position:absolute;
+    position: absolute;
+	top: 0.3em;
+	width:650px;
+	left:650px;		
 }
 #basemapToggleDiv {
 	right:75px;
 	top:20px;
 	z-index:50;
 	position:absolute;
+}
+#banner
+{
+	background-color: #21610B;
 }
