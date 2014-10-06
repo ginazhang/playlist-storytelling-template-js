@@ -51,9 +51,9 @@
 </div><!--/side-pane-->
 
 <div id="content" class="region-center">
-	<div id="banner" class="region-top">
+	<div id="banner" class="region-top" style="background:green;">
 
-		<div id="header-text" class="region-center">
+		<div id="header-text" class="region-center" style="top: 0px; left: 0px; height: 100px; width: 1720px;">
 			<h1 class="back-button icon-left-arrow"><span>Explore Map</span></h1>
 			<h1 id="title" class="title-text"><%= data.config.title ? data.config.title : "Add title here" %></h1>
 			<h2 id="subtitle" class="subtitle-text"><%= data.config.subtitle ? data.config.subtitle : "Add subtitle here" %></h2>
@@ -67,15 +67,16 @@
 				<span class="icon-link social-share"></span>
 			</div><!--/social-->
 			<div id="logo">
-				<a id="logoLink" href="http://www.neorsd.org" target="_blank">
-					<img id="logoImg" src="http://arcgis.neorsd.org/storymaps/resources/icons/NEORSD.gif" alt="NEORSD - Home">
+				<a id="logoLink" target="_blank" href="http://www.neorsd.org">
+				<img id="logoImg" alt="NEORSD - Home" src="http://arcgis.neorsd.org/storymaps/resources/icons/NEORSD.gif">
 				</a><!--/logoLink-->
 			</div><!--/logo-->
 			
 		</div><!--/branding-wrapper-->
 		<br>
-		<div id="toolPane" class="region-bottom" >
+		<div id="toolPane" class="region-bottom">		
 			<div id="playlist-controls" class="region-left">
+			<label id="HelpSearchBoxText" style="top: 10px; left:350px; bottom: 2px; position: absolute;font: 15px bold;">Enter Project or Ward Name</label>		
 					<input id="search" type="text" id="playlist-search" name="Search" placeholder="Type to search...">
 					<span id="search-submit" class="icon-search"></span>
 					
@@ -92,7 +93,8 @@
 			</div>
 			<div id="searchRadioContainer">
 				<form>
-					<div id="radio" >
+					<label id="HelpRadioOptionText" style="top: 10px; left:20px; bottom: 2px;position: absolute;font: 15px bold;">Select Search Option</label>
+					<div id="radio" style="padding-left: 10px;">
 						<input type="radio" id="projectNameRdBtn" name="project" value="attribute" checked="checked">
 						<label for="projectNameRdBtn">Project Name</label>
 						<input type="radio" id="communityBoundaryRdBtn" name="project" value="communityBoundary">
@@ -102,8 +104,7 @@
 					</div>
 				</form>
 			</div>	
-			<div id="TimeSliderDiv">
-			</div>		
+			<div id="TimeSliderDiv"></div>		
 		</div>
 		<div id="mobile-controls" class="region-right">
 			<span class="icon-open-book playlist-control toggle-description"></span>

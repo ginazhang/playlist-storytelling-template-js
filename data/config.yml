@@ -17,9 +17,9 @@ metaKeywords: Story Map
 # Description of story map
 metaDescription: Add description for app
 # Permanent URL of app. Will be used as default URL when shared on Facebook and Twitter
-metaSocialURL: http://www.neorsd.org/
+metaSocialURL: http://storymaps.esri.com
 # Permanent URL of app thumbnail. This is the thumbnail to be used when app is shared to Facebook and Twitter
-metaThumbnailURL: http://arcgis.neorsd.org/storymaps/resources/icons/NEORSD.gif
+metaThumbnailURL: http://sample.com/thumbnail.png
 # Website/Organization's name to be used in sharing to Facebook and Twitter
 metaSiteName: Esri
 # Default text to be used while sharing app on Twitter
